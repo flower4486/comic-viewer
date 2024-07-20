@@ -1,10 +1,10 @@
-import JSZip from 'jszip';
+import JSZip, { file } from 'jszip';
 let extractedImages = ref([]);
 
 // 自定义比较函数，用于按照类似格式的属性进行自然数排序
 function compareLabels(a, b) {
-  const numberA = parseInt(a.name.match(/\d+/g)[1]);
-  const numberB = parseInt(b.name.match(/\d+/g)[1]);
+  const numberA = a.index;
+  const numberB = b.index;
   return numberA - numberB;
 }
 
@@ -14,39 +14,39 @@ const extractAndDisplayImages = (zipData) => {
   }
   JSZip.loadAsync(zipData).then((zip) => {
     const imagePromises = [];
-    let dics = [];
-    // console.log('zip:', zip);
+    zip.forEach((relativePath, file) => {
+      if (!file.dir && file.name.match(/\.(webp|jpeg|png|jpg)$/g)) {
+        const imagePromise = file.async('blob').then((imageBlob) => {
+          return URL.createObjectURL(imageBlob);
+        });
+        imagePromises.push(imagePromise);
+      }
+    });
+    Promise.all(imagePromises).then((images) => {
+      extractedImages.value = images;
+    });
+  });
+};
+const extractAndDisplayImages_sync = (zipFile) => {
+  let dics = [];
+  JSZip.loadAsync(zipFile).then((zip) => {
     zip.forEach((relativePath, file) => {
       if (!file.dir && file.name.match(/\.(webp|jpg|jpeg|png)$/i)) {
         dics.push(file);
       }
     });
-    // Promise.all(imagePromises).then((Images) => {
-    //   // console.log('Images', Images);
-    //   extractedImages = Images;
-    // });
-    dics.sort(compareLabels);
-    console.log(dics);
-    for (const file of dics) {
+
+    dics.forEach((file, index) => {
       file
         .async('blob')
         .then((imageBlob) => {
           return URL.createObjectURL(imageBlob);
         })
         .then((img) => {
-          extractedImages.value.push(img);
+          extractedImages.value.push({ img, index });
         });
-    }
+    });
   });
 };
-async function processImage(file) {
-  try {
-    const imageBlob = await file.async('blob');
-    const img = URL.createObjectURL(imageBlob);
-    extractedImages.value.push(img);
-  } catch (error) {
-    // 处理错误
-    console.error(error);
-  }
-}
-export { extractedImages, extractAndDisplayImages };
+
+export { extractedImages, extractAndDisplayImages, extractAndDisplayImages_sync, compareLabels };
