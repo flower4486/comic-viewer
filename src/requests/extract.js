@@ -29,14 +29,18 @@ const extractAndDisplayImages = (zipData) => {
 };
 const extractAndDisplayImages_sync = (zipFile) => {
   let dics = [];
+  extractedImages.value = [];
   JSZip.loadAsync(zipFile).then((zip) => {
     zip.forEach((relativePath, file) => {
       if (!file.dir && file.name.match(/\.(webp|jpg|jpeg|png)$/i)) {
         dics.push(file);
       }
     });
+    // console.log('dics', dics);
 
-    dics.forEach((file, index) => {
+    dics.forEach((file) => {
+      let index = parseInt(file.name.match(/\d+/g)[1]);
+      // console.log(file.name, index);
       file
         .async('blob')
         .then((imageBlob) => {
