@@ -1,5 +1,5 @@
 <script setup>
-import { usePathStore } from '@/store/index';
+import { usePathStore } from '@/store/pathStore';
 const store = usePathStore();
 </script>
 
@@ -8,8 +8,6 @@ const store = usePathStore();
   <p><strong>Current pinia path:</strong> {{ store.path }}</p>
   <nav>
     <RouterLink :to="{ name: 'Folder', params: { path: '/' } }">文件夹</RouterLink>
-
-    <RouterLink to="/reader">看漫画</RouterLink>
   </nav>
   <main>
     <RouterView />

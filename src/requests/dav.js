@@ -16,5 +16,8 @@ async function getFileContent(path) {
   const buff = await client.getFileContents(path);
   return buff;
 }
-
-export { listDirectory, getFileContent };
+async function getFileText(path) {
+  const text = await client.getFileContents(path, { format: 'text' });
+  return text;
+}
+export { listDirectory, getFileContent, getFileText };

@@ -11,9 +11,14 @@ export const constantRoutes = [
     },
   },
   {
-    path: '/reader/:path',
-    name: 'Reader',
-    component: () => import('@/view/reader/index.vue'),
+    path: '/comic',
+    name: 'Comic',
+    component: () => import('@/view/reader/comic.vue'),
+  },
+  {
+    path: '/novel/',
+    name: 'Novel',
+    component: () => import('@/view/reader/novel.vue'),
   },
   // {
   //   // path: '/404',

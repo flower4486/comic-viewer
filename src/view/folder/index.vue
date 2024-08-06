@@ -1,35 +1,38 @@
 <script setup>
-import { listDirectory } from '@/requests/dav';
-import { useRouter, useRoute } from 'vue-router';
+import { listDirectory, getFileText, getFileContent } from '@/requests/dav';
 import { watch } from 'vue';
+import { usePathStore } from '@/store/pathStore';
+import { useNovelStore } from '@/store/novelStore';
+import { getFileType } from '@/utils/utils';
+import { getNovelId, uploadNovel, getChapterList } from '@/api/novel';
+const store = usePathStore();
+const novelStore = useNovelStore();
 
 const router = useRouter();
 const route = useRoute();
 let directoryItems = $ref([
   { basename: '漫画', type: 'directory' },
   { basename: '写真', type: 'directory' },
+  { basename: '小说', type: 'directory' },
 ]);
-// let path = $ref('/');
 
 async function updateList() {
   let folder_path = route.params.path.split('/第')[0];
-  console.log('folder_path', folder_path);
+  // console.log('folder_path', folder_path);
   let listDir = await listDirectory(folder_path);
-  console.log('列表', listDir);
-  console.log('排序后', listDir.sort(compareLabels));
-  directoryItems = listDir;
+  directoryItems = listDir.sort(compareLabels);
+  // console.log('directoryItems', directoryItems);
 }
 watch(route, (newValue, oldValue) => {
-  // path = newValue.params.path
   console.log('path', newValue.params.path);
+  store.path = newValue.params.path;
+  // console.log('store.path', store.path);
   updateList();
 });
 // 自定义比较函数，根据字符串中的数字部分进行排序
 function compareLabels(a, b) {
   const numA = a.basename.match(/\d+/) == null ? a.basename : parseInt(a.basename.match(/\d+/)[0]); // 提取字符串中的数字部分并转为整数
   const numB = b.basename.match(/\d+/) == null ? b.basename : parseInt(b.basename.match(/\d+/)[0]);
-  // const numA = parseInt(a.basename.match(/\d+/)[0]); // 提取字符串中的数字部分并转为整数
-  // const numB = parseInt(b.basename.match(/\d+/)[0]);
   return numA - numB;
 }
 
@@ -48,38 +51,77 @@ function pop_path() {
   let path = route.params.path;
   const lastSlashIndex = path.lastIndexOf('/');
   path = path.substring(0, lastSlashIndex);
+  if (path == '') path = '/';
   console.log(path);
   router.push({ name: 'Folder', params: { path: path } });
 }
-function read(filename) {
-  // push_path(filename);
-  router.push({ name: 'Reader', params: { path: route.params.path + '/' + filename } });
+function readComic(index, filename) {
+  store.index = index;
+  store.comicFiles = directoryItems;
+  // console.log('store.comicFiles', store.comicFiles);
+  router.push({ name: 'Comic' });
+}
+
+async function readNovel(basename, index) {
+  console.log('basename', basename);
+  let nid = -1;
+  nid = await getNovelId(basename);
+  if (nid == -1) {
+    //数据库没有小说，上传小说
+    try {
+      let buff = await getFileText(directoryItems[index].filename);
+      const NovelBlob = new Blob([buff]);
+      // 创建 File 对象
+      const file = new File([NovelBlob], encodeURIComponent(basename), { type: 'text/plain;charset=utf-8' });
+      let formData = new FormData();
+      // 确保在获取文件内容后再继续处理
+      formData.append('file', file);
+      console.log('formdata append', formData.get('file'), basename);
+      uploadNovel(formData);
+    } catch (error) {
+      console.error(error);
+    }
+  } else {
+    //数据库有小说，先设置好pinia参数，然后直接进入阅读界面
+    novelStore.novel_name = basename.split('.')[0];
+    //请求章节列表
+    novelStore.chapter_dics = await getChapterList(nid);
+    // console.log('novelStore.chapter_dics', novelStore.chapter_dics);
+    router.push({ name: 'Novel' });
+  }
 }
 </script>
 <template>
   <button @click="updateList">更新文件夹</button>
   <button @click="pop_path">返回上一级</button>
-  <el-scrollbar>
-    <div>
-      <div v-for="item in directoryItems" :key="item" class="scrollbar-demo-item">
-        <p>{{ item.basename }}&nbsp;</p>
-        <!-- <p>类型：{{ item.type }}&nbsp;</p> -->
-        <button v-if="item.type == 'directory'" @click="push_path(item.basename)">></button>
-        <button v-else @click="read(item.basename)">阅读</button>
-      </div>
+  <div class="grid-container">
+    <div v-for="(item, index) in directoryItems" :key="item" class="grid-item">
+      <p>{{ item.basename }}&nbsp;</p>
+      <!-- <p>类型：{{ item.type }}&nbsp;</p> -->
+      <button v-if="item.type == 'directory'" @click="push_path(item.basename)">></button>
+      <button v-else-if="item.type == 'file' && getFileType(item.filename) == 'zip'" @click="readComic(index, item.basename)">阅读漫画</button>
+      <button v-else-if="item.type == 'file' && getFileType(item.filename) == 'txt'" @click="readNovel(item.basename, index)">阅读小说</button>
     </div>
-  </el-scrollbar>
+  </div>
 </template>
 <style scoped>
-.scrollbar-demo-item {
+.grid-container {
   display: flex;
-  align-items: center;
-  justify-content: center;
-  height: 50px;
+  flex-wrap: wrap;
+  justify-content: space-between; /* 控制水平方向上的间距 */
+}
+
+.grid-item {
+  flex: calc(25% - 20px); /* 设置每个项目的宽度，减去 margin 的部分 */
   margin: 10px;
   text-align: center;
   border-radius: 4px;
   background: var(--el-color-primary-light-9);
-  color: var(--el-color-primary);
+  /* color: var(--el-color-primary); */
+  color: black;
+
+  display: flex; /* 将 .grid-item 设置为 flex 布局 */
+  justify-content: center; /* 水平居中 */
+  align-items: center; /* 垂直居中 */
 }
 </style>

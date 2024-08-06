@@ -5,50 +5,55 @@
       <img :src="item.img" />
     </div>
   </el-scrollbar>
-  <button @click="router_back">返回</button>
+  <el-button type="primary" @click="router_back">返回</el-button>
+  <el-button type="primary" @click="last_chapter">上一章</el-button>
+  <el-button type="primary" @click="next_chapter">下一章</el-button>
 </template>
 
 <script setup>
 import { getFileContent } from '@/requests/dav';
 import { extractedImages, extractAndDisplayImages_sync, compareLabels } from '@/requests/extract';
 import { useRouter, useRoute } from 'vue-router';
-import { watch } from 'vue';
+import { watch, ref } from 'vue';
+import { usePathStore } from '@/store/pathStore';
+const store = usePathStore();
 
 const router = useRouter();
 const route = useRoute();
 
 let show_imgs = $ref([]);
 let zipFile = $ref(null);
-//获取压缩包并解压
-let davpromise = getFileContent(route.params.path);
 
-davpromise.then((res) => {
-  console.log('压缩包获取', res);
-  zipFile = res;
-  extractAndDisplayImages_sync(zipFile);
-  show_imgs = extractedImages.value;
-  console.log('排序前', show_imgs);
-});
+// //获取压缩包并解压
+// let davpromise = getFileContent(route.params.path);
 
-watch(route, (newValue, oldValue) => {
-  //获取压缩包并解压
-  let davpromise = getFileContent(route.params.path);
-
+updateList(store.index);
+function updateList(index) {
+  let file_path = store.path + '/' + store.comicFiles[index].basename;
+  console.log('file_path', file_path);
+  let davpromise = getFileContent(file_path);
   davpromise.then((res) => {
-    console.log('压缩包获取', res);
+    // console.log('压缩包获取', res);
     zipFile = res;
     extractAndDisplayImages_sync(zipFile);
     show_imgs = extractedImages.value;
-    console.log('排序前', show_imgs);
+    // console.log('排序前', show_imgs);
   });
-});
+}
 
 function orderImg() {
   show_imgs.sort(compareLabels);
 }
 function router_back() {
-  console.log('route.params.path', route.params.path);
-  router.push({ name: 'Folder', params: { path: route.params.path } });
+  router.push({ name: 'Folder', params: { path: store.path } });
+}
+function next_chapter() {
+  store.index++;
+  updateList(store.index);
+}
+function last_chapter() {
+  store.index--;
+  updateList(store.index);
 }
 </script>
 
