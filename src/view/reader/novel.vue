@@ -4,41 +4,52 @@
   <div class="read" ref="dvtop">
     <el-button type="primary" @click="router_back">返回</el-button>
     <el-button type="primary" @click="last_chapter">上一章</el-button>
+    <el-text class="mx-1" type="primary">{{ parseInt(page_index) + 1 }}/{{ content_dics.length }}</el-text>
     <el-button type="primary" @click="next_chapter">下一章</el-button>
+
     <el-button type="primary" @click="showCatlog">目录</el-button>
 
-    <div style="min-height: 500px; padding-top: 30px">
+    <div style="min-height: 500px; padding-top: 30px; padding-bottom: 40px">
       <h1 class="read-h1">{{ chapter_name }}</h1>
-      <div v-for="item in content_dics[0]" :key="item">
-        <p class="read-text" v-html="item"></p>
+      <div v-for="(page, index) in content_dics" :key="page">
+        <div v-for="para in page" :key="para">
+          <p v-show="index == page_index" class="read-text" v-html="para"></p>
+        </div>
       </div>
     </div>
 
     <catlog @readshows="readshows" v-show="pageConfig.catlogShow" @closeLayer="showCatlog()" />
 
     <div class="readbottom">
-      <el-button type="primary" @click="router_back">返回</el-button>
       <el-button type="primary" @click="last_chapter">上一章</el-button>
       <el-button type="primary" @click="next_chapter">下一章</el-button>
-      <el-button type="primary" @click="showCatlog">目录</el-button>
+      <el-button type="primary" @click="last_page">上一页</el-button>
+      <el-button type="primary" @click="next_page">下一页</el-button>
+      <!-- <el-button type="primary" @click="showCatlog">目录</el-button> -->
+      <!-- <el-button type="primary" @click="topDiv">回到顶部</el-button> -->
     </div>
   </div>
 </template>
 
 <script setup>
-import { useRouter } from 'vue-router';
+import { useRouter, useRoute } from 'vue-router';
 import { usePathStore } from '@/store/pathStore';
 import { useNovelStore } from '@/store/novelStore';
 import { getChapterContent } from '@/api/novel';
-import { ref } from 'vue';
+import { ref, onBeforeUnmount, onMounted } from 'vue';
+import { setStore, getStore, removeStore } from '@/utils/store';
 import catlog from './components/catlog.vue';
+import { chunkArray } from '@/utils/utils';
 
-const dvtop = ref(null);
+const dvtop = ref();
 const router = useRouter();
+const route = useRoute();
 const pathStore = usePathStore();
 const novelStore = useNovelStore();
 let content_dics = $ref([]);
+let page_index = $ref(0);
 let chapter_name = $ref([]);
+let nid = -1;
 let pageConfig = $ref({
   catlogShow: false,
 });
@@ -50,7 +61,11 @@ function next_chapter() {
   if (novelStore.chapter_index != novelStore.chapter_dics.length - 1) {
     novelStore.chapter_index++;
     updateChapterContent();
-    dvtop.scrollTop = 0;
+
+    //每次切换章节将page——index归零
+    novelStore.page_index = 0;
+    page_index = novelStore.page_index;
+    dvtop.value.scrollIntoView({ behavior: 'smooth', block: 'start' });
   } else {
     window.alert('已经是最后一章');
   }
@@ -59,18 +74,70 @@ function last_chapter() {
   if (novelStore.chapter_index != 0) {
     novelStore.chapter_index--;
     updateChapterContent();
-    dvtop.scrollTop = 0;
+
+    //每次切换章节将page——index归零
+    novelStore.page_index = 0;
+    page_index = novelStore.page_index;
+    dvtop.value.scrollIntoView({ behavior: 'smooth', block: 'start' });
   } else {
     window.alert('已经是第一章');
   }
 }
 
+function last_page() {
+  if (novelStore.page_index != 0) {
+    novelStore.page_index--;
+    page_index = novelStore.page_index;
+    dvtop.value.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  } else {
+    window.alert('已经是第一页');
+  }
+}
+function next_page() {
+  if (novelStore.page_index != content_dics.length - 1) {
+    novelStore.page_index++;
+    page_index = novelStore.page_index;
+    dvtop.value.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  } else {
+    window.alert('已经是最后一页');
+  }
+}
+//页面回到顶部
+function topDiv() {
+  // dvtop.value.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  pageScrollTo(0);
+}
+// 滚动到页面某个位置
+function pageScrollTo(topScroll) {
+  window.scrollTo({
+    top: topScroll,
+    behavior: 'smooth',
+  });
+}
+
+// // 定义鼠标滚轮事件处理函数
+const handleScroll = () => {
+  // // 获取页面垂直滚动距离
+  // const scrollTop = window.scrollY;
+  // // 获取页面水平滚动距离
+  // const scrollLeft = window.scrollX;
+  // // 在控制台打印滚动位置
+  // console.log('页面垂直滚动距离:', scrollTop);
+  // console.log('页面水平滚动距离:', scrollLeft);
+  // 在这里可以根据滚动位置执行相应的操作
+};
+
 // 点击目录的章节 子组件传给父组件
 function readshows(index) {
   pageConfig.catlogShow = !pageConfig.catlogShow;
   novelStore.chapter_index = index;
+
+  //每次切换章节将page——index归零
+  novelStore.page_index = 0;
+  page_index = novelStore.page_index;
+
   updateChapterContent();
-  dvtop.scrollTop = 0;
+  dvtop.value.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 //    点击显示目录
 function showCatlog() {
@@ -79,33 +146,84 @@ function showCatlog() {
 
 //获取章节内容
 async function updateChapterContent() {
-  // console.log(novelStore.chapter_dics);
+  console.log(novelStore.chapter_index);
   let chapter_id = novelStore.chapter_dics[novelStore.chapter_index].cid;
   chapter_name = novelStore.chapter_dics[novelStore.chapter_index].cname;
   let contentres = await getChapterContent(chapter_id);
   let chapter_text = contentres[0].content;
-  content_dics = [chapter_text.split('\n')];
-  console.log('content_dics', content_dics);
+  content_dics = chapter_text.split('\n');
+  content_dics = chunkArray(content_dics, 20);
+
+  // console.log('content_dics', content_dics);
 }
 
-updateChapterContent();
+//挂载后执行页面初始化操作
+onMounted(() => {
+  //再进页面之前，是由Folder路由组件设置好了小说的1. 目录列表 2. index 3.novel_name
+  //现在需要利用本地存储里面的数值，重新赋值index，并滑动到指定位置
+  nid = route.params.nid;
+  const mem_index = getStore(`${nid}_chapter_index`);
+  console.log('mem_index', mem_index);
+
+  if (mem_index != null) novelStore.chapter_index = mem_index;
+
+  updateChapterContent();
+
+  //恢复页面的pageindex
+  novelStore.page_index = getStore(`${nid}_page_index`);
+  page_index = novelStore.page_index;
+  // console.log('getStore(`${nid}_scrollTop`)', getStore(`${nid}_scrollTop`));
+  //恢复页面的滚动
+  // const mem_scroll = getStore(`${nid}_scrollTop`);
+  // if (mem_scroll) {
+  //   dvtop.value.scrollTop = getStore(`${nid}_scrollTop`);
+  // }
+});
+
+//销毁页面时要做的记录
+onBeforeUnmount(() => {
+  //记录此时所读的cid（有了cid就知道了nid，cname，content），但由于进入小说界面是已经确定了小说名字，所以记录cid即可
+  //浏览器本地存储
+  // // 获取页面垂直滚动距离
+  const scrollTop = parseInt(dvtop.value.scrollTop);
+  setStore(`${nid}_chapter_index`, novelStore.chapter_index);
+  // setStore(`${nid}_scrollTop`, scrollTop);
+  setStore(`${nid}_page_index`, novelStore.page_index);
+});
+window.addEventListener('beforeunload', function (event) {
+  // 在页面关闭之前保存数据
+  // // 获取页面垂直滚动距离
+  const scrollTop = parseInt(dvtop.value.scrollTop);
+  setStore(`${nid}_chapter_index`, novelStore.chapter_index);
+  // setStore(`${nid}_scrollTop`, scrollTop);
+  setStore(`${nid}_page_index`, novelStore.page_index);
+});
 </script>
 
 <style lang="scss" scoped>
 .read {
   overflow-y: auto;
   z-index: 101;
-  position: relative;
+  position: absolute;
+  margin: 0%;
   top: 0;
+  left: 0%;
   width: 100%;
   height: 100%;
   background-color: #c4b395;
   padding: 20px;
   line-height: 24px;
   letter-spacing: 2px;
+  // overflow: hidden;
   .read-h1 {
     font-size: 20px;
   }
+  // .readpage {
+  //   columns: calc(100vw - 32px) 1;
+  //   column-gap: 16px;
+  //   height: 100%;
+  //   transition: 0.4s;
+  // }
   .readheader {
     width: 100%;
     position: fixed;

@@ -1,13 +1,14 @@
 import { defineStore } from 'pinia';
-
-export const usePathStore = defineStore('path', () => {
-  let path = $ref('/');
-  let comicFiles = $ref([]);
-  let index = $ref(0);
-
-  return {
-    path,
-    comicFiles,
-    index,
-  };
+export const usePathStore = defineStore({
+  id: 'path',
+  state: () => {
+    return {
+      path: '/',
+      comicFiles: [],
+      index: 0,
+    };
+  },
+  persist: {
+    enabled: true, // 这个配置代表存储生效，而且是整个store都存储
+  },
 });

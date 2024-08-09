@@ -1,6 +1,6 @@
 <script setup>
 import { listDirectory, getFileText, getFileContent } from '@/requests/dav';
-import { watch } from 'vue';
+import { onMounted } from 'vue';
 import { usePathStore } from '@/store/pathStore';
 import { useNovelStore } from '@/store/novelStore';
 import { getFileType } from '@/utils/utils';
@@ -17,16 +17,14 @@ let directoryItems = $ref([
 ]);
 
 async function updateList() {
-  let folder_path = route.params.path.split('/第')[0];
+  let folder_path = store.path.split('/第')[0];
   // console.log('folder_path', folder_path);
   let listDir = await listDirectory(folder_path);
   directoryItems = listDir.sort(compareLabels);
   // console.log('directoryItems', directoryItems);
 }
-watch(route, (newValue, oldValue) => {
-  console.log('path', newValue.params.path);
-  store.path = newValue.params.path;
-  // console.log('store.path', store.path);
+
+onMounted(() => {
   updateList();
 });
 // 自定义比较函数，根据字符串中的数字部分进行排序
@@ -37,23 +35,25 @@ function compareLabels(a, b) {
 }
 
 function push_path(folder) {
-  let path = route.params.path;
+  let path = store.path;
   if (path != '/') {
     path = path + '/' + folder;
   } else {
     path = path + folder;
   }
-  console.log(path);
-  router.push({ name: 'Folder', params: { path: path } });
+
+  store.path = path;
+  updateList();
 }
 
 function pop_path() {
-  let path = route.params.path;
+  let path = store.path;
   const lastSlashIndex = path.lastIndexOf('/');
   path = path.substring(0, lastSlashIndex);
   if (path == '') path = '/';
-  console.log(path);
-  router.push({ name: 'Folder', params: { path: path } });
+
+  store.path = path;
+  updateList();
 }
 function readComic(index, filename) {
   store.index = index;
@@ -87,7 +87,7 @@ async function readNovel(basename, index) {
     //请求章节列表
     novelStore.chapter_dics = await getChapterList(nid);
     // console.log('novelStore.chapter_dics', novelStore.chapter_dics);
-    router.push({ name: 'Novel' });
+    router.push({ name: 'Novel', params: { nid: nid } });
   }
 }
 </script>

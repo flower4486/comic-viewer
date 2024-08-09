@@ -16,7 +16,7 @@ export const constantRoutes = [
     component: () => import('@/view/reader/comic.vue'),
   },
   {
-    path: '/novel/',
+    path: '/novel/:nid',
     name: 'Novel',
     component: () => import('@/view/reader/novel.vue'),
   },

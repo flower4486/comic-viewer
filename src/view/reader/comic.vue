@@ -14,9 +14,9 @@
 import { getFileContent } from '@/requests/dav';
 import { extractedImages, extractAndDisplayImages_sync, compareLabels } from '@/requests/extract';
 import { useRouter, useRoute } from 'vue-router';
-import { watch, ref } from 'vue';
+import { onMounted, onUpdated } from 'vue';
 import { usePathStore } from '@/store/pathStore';
-const store = usePathStore();
+const pathStore = usePathStore();
 
 const router = useRouter();
 const route = useRoute();
@@ -26,10 +26,14 @@ let zipFile = $ref(null);
 
 // //获取压缩包并解压
 // let davpromise = getFileContent(route.params.path);
+onMounted(() => {
+  console.log(pathStore);
 
-updateList(store.index);
+  updateList(pathStore.index);
+});
+
 function updateList(index) {
-  let file_path = store.path + '/' + store.comicFiles[index].basename;
+  let file_path = pathStore.path + '/' + pathStore.comicFiles[index].basename;
   console.log('file_path', file_path);
   let davpromise = getFileContent(file_path);
   davpromise.then((res) => {
@@ -45,15 +49,15 @@ function orderImg() {
   show_imgs.sort(compareLabels);
 }
 function router_back() {
-  router.push({ name: 'Folder', params: { path: store.path } });
+  router.push({ name: 'Folder', params: { path: pathStore.path } });
 }
 function next_chapter() {
-  store.index++;
-  updateList(store.index);
+  pathStore.index++;
+  updateList(pathStore.index);
 }
 function last_chapter() {
-  store.index--;
-  updateList(store.index);
+  pathStore.index--;
+  updateList(pathStore.index);
 }
 </script>
 

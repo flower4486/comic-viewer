@@ -25,15 +25,10 @@
 
 <script setup>
 import { useNovelStore } from '@/store/novelStore';
-import { defineEmits } from 'vue';
+import { defineEmits, onMounted } from 'vue';
+import { chapterSort } from '@/utils/utils';
 let novelStore = useNovelStore();
 let chapter_list = $ref([]);
-// 自定义比较函数，根据字符串中的数字部分进行排序
-function compareLabels(a, b) {
-  const numA = a.cname.match(/\d+/) == null ? a.cname : parseInt(a.cname.match(/\d+/)[0]); // 提取字符串中的数字部分并转为整数
-  const numB = b.cname.match(/\d+/) == null ? b.cname : parseInt(b.cname.match(/\d+/)[0]);
-  return numA - numB;
-}
 
 const emit = defineEmits(['readshows', 'closeLayer']);
 function getIndex(index) {
@@ -42,9 +37,14 @@ function getIndex(index) {
 function getback() {
   emit('closeLayer');
 }
-chapter_list = novelStore.chapter_dics;
-// chapter_list.sort(compareLabels());
-console.log('chapterlist sort', chapter_list.sort(compareLabels));
+
+onMounted(() => {
+  //对章节列表进行排序
+  chapter_list = novelStore.chapter_dics;
+  console.log("chapter_list",chapter_list);
+
+  chapter_list.sort(chapterSort);
+});
 </script>
 
 <style lang="scss" scoped>
