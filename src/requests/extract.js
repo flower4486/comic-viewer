@@ -38,9 +38,8 @@ const extractAndDisplayImages_sync = (zipFile) => {
     });
     // console.log('dics', dics);
 
-    dics.forEach((file) => {
-      let index = parseInt(file.name.match(/\d+/g)[1]);
-      // console.log(file.name, index);
+    dics.forEach((file, index) => {
+      console.log('file.name', file.name);
       file
         .async('blob')
         .then((imageBlob) => {

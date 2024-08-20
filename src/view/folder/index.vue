@@ -4,7 +4,8 @@ import { onMounted } from 'vue';
 import { usePathStore } from '@/store/pathStore';
 import { useNovelStore } from '@/store/novelStore';
 import { getFileType } from '@/utils/utils';
-import { getNovelId, uploadNovel, getChapterList } from '@/api/novel';
+import { getNovelId, uploadNovel, getChapterList, deleNovelPost } from '@/api/novel';
+import { ArrowDown } from '@element-plus/icons-vue';
 const store = usePathStore();
 const novelStore = useNovelStore();
 
@@ -61,6 +62,12 @@ function readComic(index, filename) {
   // console.log('store.comicFiles', store.comicFiles);
   router.push({ name: 'Comic' });
 }
+function readEpub(index, filename) {
+  store.index = index;
+  store.comicFiles = directoryItems;
+  // console.log('store.comicFiles', store.comicFiles);
+  router.push({ name: 'Epub' });
+}
 
 async function readNovel(basename, index) {
   console.log('basename', basename);
@@ -76,8 +83,10 @@ async function readNovel(basename, index) {
       let formData = new FormData();
       // 确保在获取文件内容后再继续处理
       formData.append('file', file);
-      console.log('formdata append', formData.get('file'), basename);
-      uploadNovel(formData);
+      // console.log('formdata append', formData.get('file'), basename);
+      await uploadNovel(formData).then((res) => {
+        window.alert(res);
+      });
     } catch (error) {
       console.error(error);
     }
@@ -90,6 +99,21 @@ async function readNovel(basename, index) {
     router.push({ name: 'Novel', params: { nid: nid } });
   }
 }
+
+async function deleNovel(basename) {
+  let nid = -1;
+  nid = await getNovelId(basename);
+  if (nid == -1) {
+    //数据库没有小说，上传小说
+    //什么也不做
+  } else {
+    //数据库有小说，就要删除小说
+    await deleNovelPost(nid).then((res) => {
+      window.alert(res);
+    });
+    // console.log('delete res', res);
+  }
+}
 </script>
 <template>
   <button @click="updateList">更新文件夹</button>
@@ -100,7 +124,22 @@ async function readNovel(basename, index) {
       <!-- <p>类型：{{ item.type }}&nbsp;</p> -->
       <button v-if="item.type == 'directory'" @click="push_path(item.basename)">></button>
       <button v-else-if="item.type == 'file' && getFileType(item.filename) == 'zip'" @click="readComic(index, item.basename)">阅读漫画</button>
-      <button v-else-if="item.type == 'file' && getFileType(item.filename) == 'txt'" @click="readNovel(item.basename, index)">阅读小说</button>
+      <button v-else-if="item.type == 'file' && getFileType(item.filename) == 'epub'" @click="readEpub(index, item.basename)">阅读漫画</button>
+
+      <!-- <button  >阅读小说</button> -->
+      <el-dropdown v-else-if="item.type == 'file' && getFileType(item.filename) == 'txt'">
+        <span class="el-dropdown-link">
+          <el-icon class="el-icon--right">
+            <arrow-down />
+          </el-icon>
+        </span>
+        <template #dropdown>
+          <el-dropdown-menu>
+            <el-dropdown-item @click="readNovel(item.basename, index)">阅读</el-dropdown-item>
+            <el-dropdown-item @click="deleNovel(item.basename)">删除</el-dropdown-item>
+          </el-dropdown-menu>
+        </template>
+      </el-dropdown>
     </div>
   </div>
 </template>
@@ -123,5 +162,11 @@ async function readNovel(basename, index) {
   display: flex; /* 将 .grid-item 设置为 flex 布局 */
   justify-content: center; /* 水平居中 */
   align-items: center; /* 垂直居中 */
+}
+.example-showcase .el-dropdown-link {
+  cursor: pointer;
+  color: var(--el-color-primary);
+  display: flex;
+  align-items: center;
 }
 </style>

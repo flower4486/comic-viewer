@@ -1,29 +1,34 @@
 <template>
   <button @click="orderImg">更正顺序</button>
-  <el-scrollbar>
-    <div v-for="item in show_imgs" :key="item.index" class="scrollbar-demo-item">
-      <img :src="item.img" />
+  <div ref="divread" class="comic-div">
+    <el-scrollbar>
+      <div v-for="item in show_imgs" :key="item.index" class="scrollbar-demo-item">
+        <img :src="item.img" />
+      </div>
+    </el-scrollbar>
+
+    <div class="readbottom">
+      <el-button type="primary" @click="router_back">返回</el-button>
+      <el-button type="primary" @click="last_chapter">上一章</el-button>
+      <el-button type="primary" @click="next_chapter">下一章</el-button>
     </div>
-  </el-scrollbar>
-  <el-button type="primary" @click="router_back">返回</el-button>
-  <el-button type="primary" @click="last_chapter">上一章</el-button>
-  <el-button type="primary" @click="next_chapter">下一章</el-button>
+  </div>
 </template>
 
 <script setup>
 import { getFileContent } from '@/requests/dav';
 import { extractedImages, extractAndDisplayImages_sync, compareLabels } from '@/requests/extract';
 import { useRouter, useRoute } from 'vue-router';
-import { onMounted, onUpdated } from 'vue';
+import { onMounted, ref } from 'vue';
 import { usePathStore } from '@/store/pathStore';
 const pathStore = usePathStore();
-
 const router = useRouter();
 const route = useRoute();
 
 let show_imgs = $ref([]);
 let zipFile = $ref(null);
 
+let divread = ref();
 // //获取压缩包并解压
 // let davpromise = getFileContent(route.params.path);
 onMounted(() => {
@@ -34,18 +39,20 @@ onMounted(() => {
 
 function updateList(index) {
   let file_path = pathStore.path + '/' + pathStore.comicFiles[index].basename;
-  console.log('file_path', file_path);
+  // console.log('file_path', file_path);
   let davpromise = getFileContent(file_path);
   davpromise.then((res) => {
-    // console.log('压缩包获取', res);
     zipFile = res;
     extractAndDisplayImages_sync(zipFile);
     show_imgs = extractedImages.value;
-    // console.log('排序前', show_imgs);
   });
+
+  divread.value.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
 function orderImg() {
+  console.log('show_imgs', show_imgs);
+
   show_imgs.sort(compareLabels);
 }
 function router_back() {
@@ -61,18 +68,74 @@ function last_chapter() {
 }
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .scrollbar-demo-item {
   display: flex;
   align-items: center;
-  justify-content: left;
-  margin: 0;
+  justify-content: center;
+  margin: 0px;
+  padding: 0px;
   height: 100%;
+  width: 100%;
 }
 
 .scrollbar-demo-item img {
-  max-width: 80%;
-  max-height: 100%; /* 添加最大高度限制 */
-  object-fit: contain; /* 使用 contain 填充方式 */
+  margin: 0px;
+  padding: 0px;
+  max-width: 90%;
+  height: 100%;
+  display: block;
+}
+
+.comic-div {
+  position: relative;
+  margin: 0%;
+  padding: 0;
+  width: 100%;
+}
+
+.readbottom {
+  width: 100%;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  z-index: 110;
+  opacity: 0.5;
+  background-color: #ffffff;
+  .mui-icon {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  .readbottom-color {
+    display: flex;
+    justify-content: space-around;
+    list-style: none;
+    margin-bottom: 20px;
+    li {
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+    }
+  }
+  .readbottom-dv {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    .readbottom-ml {
+      color: #fff;
+      text-align: center;
+      font-size: 14px;
+    }
+    .read-ss {
+      color: #fff;
+    }
+    .readbottom-font {
+      border: 1px solid #fff;
+      padding: 5px 20px;
+      border-radius: 3px;
+      color: #fff;
+    }
+  }
 }
 </style>

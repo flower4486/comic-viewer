@@ -16,6 +16,11 @@ export const constantRoutes = [
     component: () => import('@/view/reader/comic.vue'),
   },
   {
+    path: '/epub',
+    name: 'Epub',
+    component: () => import('@/view/reader/epub.vue'),
+  },
+  {
     path: '/novel/:nid',
     name: 'Novel',
     component: () => import('@/view/reader/novel.vue'),

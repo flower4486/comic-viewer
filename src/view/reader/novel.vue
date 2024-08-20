@@ -170,7 +170,9 @@ onMounted(() => {
   updateChapterContent();
 
   //恢复页面的pageindex
-  novelStore.page_index = getStore(`${nid}_page_index`);
+  let local_index = getStore(`${nid}_page_index`);
+  if (local_index != null) novelStore.page_index = local_index;
+  else novelStore.page_index = 0;
   page_index = novelStore.page_index;
   // console.log('getStore(`${nid}_scrollTop`)', getStore(`${nid}_scrollTop`));
   //恢复页面的滚动

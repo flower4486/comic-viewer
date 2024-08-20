@@ -20,7 +20,6 @@ export function getNovelId(novel_name) {
 }
 
 export function uploadNovel(formData) {
-  console.log('formdata', formData.get('file'));
   return new Promise((res, rej) => {
     requests({
       url: '/novel/uploadNovel',
@@ -65,6 +64,26 @@ export function getChapterContent(cid) {
       method: 'POST',
       data: {
         cid: cid,
+      },
+    })
+      .then((result) => {
+        res(result.data);
+      })
+      .catch((error) => {
+        rej(error);
+      });
+  });
+}
+
+export function deleNovelPost(nid) {
+  console.log('delenid', nid);
+
+  return new Promise((res, rej) => {
+    requests({
+      url: '/novel/deleNovel',
+      method: 'POST',
+      data: {
+        nid: nid,
       },
     })
       .then((result) => {
