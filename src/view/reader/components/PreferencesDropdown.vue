@@ -27,8 +27,8 @@
       <div class="hover" v-if="menuConfigs.opened">
         <p class="text">TEXT</p>
         <div id="gray-line">
-          <button class="text-size" id="little-letter" @click="fontSizeDecrease">A</button>
-          <button class="text-size" id="big-letter" @click="fontSizeIncrease">A</button>
+          <button class="text-size" id="little-letter" @click="fontSizeDecrease">A-</button>
+          <button class="text-size" id="big-letter" @click="fontSizeIncrease">A+</button>
         </div>
         <p class="text">BACKGROUND</p>
         <button class="button-background" :class="{ current: key === currentTheme }" :style="theme.body" v-for="(theme, key) in themes" id="key" :key="key" @click="selectTheme(key)">
@@ -42,7 +42,7 @@
 <script setup>
 import { defineProps, watch, defineEmits, onMounted, reactive } from 'vue';
 import TreeMenu from './TreeMenu.vue';
-const emit = defineEmits(['update:fontSize', 'submit', 'searchResults', 'update:currentTheme', 'input']);
+const emit = defineEmits(['update:font-size', 'update:currentTheme', 'input']);
 const props = defineProps({
   themes: {
     type: Object,
@@ -65,21 +65,15 @@ let menuConfigs = reactive({
   opened: false,
   openSearchWidget: false,
   openContentWidget: false,
-
   searchText: '',
   matches: [],
   searchResults: [],
   toc: null,
 });
-let internalFontSize = ref(props.fontSize);
 
-watch(internalFontSize, (val, oldVal) => {
-  if (val < 50 || val > 200) {
-    internalFontSize = oldVal;
-    return;
-  }
-  emit('update:fontSize', internalFontSize);
-});
+var fontSize = ref(80);
+const step = 10;
+
 function toggleDropdown() {
   menuConfigs.opened = !menuConfigs.opened;
 }
@@ -89,11 +83,18 @@ function selectTheme(key) {
 }
 
 function fontSizeIncrease() {
-  internalFontSize += step;
+  updateFontSize(fontSize + step);
 }
 
 function fontSizeDecrease() {
-  internalFontSize -= step;
+  updateFontSize(fontSize - step);
+}
+function updateFontSize(newVal) {
+  if (fontSize <= 50 || fontSize >= 200) {
+    return;
+  }
+  fontSize = newVal;
+  emit('update:font-size', fontSize);
 }
 
 function toggleSearchWidget() {
@@ -137,6 +138,7 @@ onMounted(() => {
   // this.$root.$on('toc', (toc) => {
   //   menuConfigs.toc = toc;
   // });
+  fontSize = props.fontSize;
 });
 </script>
 

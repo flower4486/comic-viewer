@@ -1,33 +1,38 @@
 <template>
-  <PreferencesDropdown
-    v-model:themes="epub_configs.themes"
-    v-model:current-theme="epub_configs.currentTheme"
-    v-model:font-size="epub_configs.size"
-    v-model="epub_configs.serchQuery"
-    @searchResults="epub_configs.onSearchResults">
-    <template #book-content>
-      <button class="my-find my-content" @click="showContent">
-        <img src="@/static/left-alignment.svg" alt="" />
-      </button>
-      <div class="search-widget1" v-if="epub_configs.openContent">
-        <TreeMenu :subContent="epub_configs.toc" @showPage="showPage" />
-      </div>
-    </template>
-    <template #book-search>
-      <button class="my-find" @click="toggleSearchWidget">
-        <img src="@/static/search.svg" alt="" />
-      </button>
-      <div class="search-widget1" v-if="epub_configs.openSearch">
-        <input type="text" :value="serchQuery" @change="props.findText($event.target.value)" />
-        <button @click="props.removeHighlight">x</button>
-        <ul>
-          <li v-for="(excerpt, i) in epub_configs.searchContent" :key="i" @click="showPage(excerpt.cfi)">
-            <p>{{ excerpt.excerpt }}</p>
-          </li>
-        </ul>
-      </div>
-    </template>
-  </PreferencesDropdown>
+  <div class="header" v-show="menuVisible">
+    <PreferencesDropdown
+      :themes="epub_configs.themes"
+      :current-theme="currentTheme"
+      :font-size="fontSize"
+      @update:currentTheme="currentTheme = $event"
+      @update:font-size="fontSize = $event"
+      @update:search-query="searchQuery = $event"
+      v-model="epub_configs.serchQuery"
+      @searchResults="epub_configs.onSearchResults">
+      <template #book-content>
+        <button class="my-find my-content" @click="showContent">
+          <img src="@/static/left-alignment.svg" alt="" />
+        </button>
+        <div class="search-widget1" v-if="epub_configs.openContent">
+          <TreeMenu :subContent="epub_configs.toc" @showPage="showPage" />
+        </div>
+      </template>
+      <template #book-search>
+        <button class="my-find" @click="toggleSearchWidget">
+          <img src="@/static/search.svg" alt="" />
+        </button>
+        <div class="search-widget1" v-if="epub_configs.openSearch">
+          <input type="text" :value="serchQuery" @change="props.findText($event.target.value)" />
+          <button @click="props.removeHighlight">x</button>
+          <ul>
+            <li v-for="(excerpt, i) in epub_configs.searchContent" :key="i" @click="showPage(excerpt.cfi)">
+              <p>{{ excerpt.excerpt }}</p>
+            </li>
+          </ul>
+        </div>
+      </template>
+    </PreferencesDropdown>
+  </div>
   <div class="read" id="reader" v-show="true">
     <!-- <vue-reader :url="epubBuffer" :getRendition="getRendition" /> -->
   </div>
@@ -37,27 +42,29 @@
     <el-button type="primary" @click="prev_page">上一页</el-button>
     <el-button type="primary" @click="next_page">下一页</el-button>
     <el-button type="primary" @click="test">功能测试</el-button>
+    <el-button type="primary" @click="menuShow">menu</el-button>
   </div>
 </template>
 
 <script setup>
-import { VueReader } from 'vue-reader';
 import Epub from 'epubjs';
 import { usePathStore } from '@/store/pathStore';
 import { getFileContent } from '@/requests/dav';
-import { onMounted } from 'vue';
+import { onMounted, watch, ref } from 'vue';
 import TreeMenu from './components/TreeMenu.vue';
 import PreferencesDropdown from './components/PreferencesDropdown.vue';
 let pathStore = usePathStore();
 let epubBuffer = $ref([]);
-let rendition = null;
-const eventBus = ref({});
 
 const flow_props = ['auto', 'scrolled-doc'];
+
 let props_select = {
   flow_index: 0,
 };
 
+let menuVisible = $ref(true);
+let fontSize = ref(80);
+let currentTheme = 'beige';
 let epub_configs = $ref({
   book: null,
   rendition: null,
@@ -70,9 +77,7 @@ let epub_configs = $ref({
   height: 0,
   locations: null,
   ready: false,
-  url: './static/alice.epub',
-  size: 80,
-  currentTheme: 'beige',
+
   themes: {
     white: {
       body: {
@@ -158,7 +163,9 @@ function resizeToScreenSize() {
   updateScreenSizeInfo();
   epub_configs.rendition.resize(epub_configs.width, epub_configs.height);
 }
-
+function menuShow() {
+  menuVisible = !menuVisible;
+}
 function debounce(func, wait, immediate) {
   let timeout;
   return () => {
@@ -233,20 +240,45 @@ function onSearchResults(value) {
 function getContent(value) {
   epub_configs.toc = value;
 }
+watch(currentTheme, (val) => {
+  console.log('', val);
+  setTheme(val);
+});
+function setTheme(theme) {
+  epub_configs.rendition.themes.select(theme);
+  document.body.style.background = epub_configs.themes[theme]['body'].background;
+}
+
+watch(fontSize, (val) => {
+  setFontSize(val);
+});
+
+function setFontSize(size) {
+  epub_configs.rendition.themes.fontSize(size + '%');
+}
 </script>
 
 <style lang="scss" scoped>
+.header {
+  overflow-y: auto;
+  z-index: 110;
+  position: absolute;
+  top: 0;
+  left: 0%;
+  width: auto;
+  padding: 20px;
+}
 .read {
   overflow-y: auto;
   z-index: 101;
-  position: relative;
+  position: fixed;
   top: 0;
   left: 0%;
   bottom: 10%;
   width: 100%;
   height: 100%;
   background-color: #c4b395;
-  padding: 20px;
+  padding: 0px;
 }
 
 .readbottom {

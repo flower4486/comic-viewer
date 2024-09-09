@@ -3,8 +3,8 @@ let extractedImages = ref([]);
 
 // 自定义比较函数，用于按照类似格式的属性进行自然数排序
 function compareLabels(a, b) {
-  const numberA = a.index;
-  const numberB = b.index;
+  const numberA = a.name;
+  const numberB = b.name;
   return numberA - numberB;
 }
 
@@ -37,19 +37,24 @@ const extractAndDisplayImages_sync = (zipFile) => {
       }
     });
     // console.log('dics', dics);
+    dics.forEach((file) => {
+      // console.log('file.name', file);
+      const name = file.name.split('/').pop().split('.')[0];
+      // console.log('file_index', name.split('/').pop().split('.')[0]);
 
-    dics.forEach((file, index) => {
-      console.log('file.name', file.name);
       file
         .async('blob')
         .then((imageBlob) => {
           return URL.createObjectURL(imageBlob);
         })
         .then((img) => {
-          extractedImages.value.push({ img, index });
+          extractedImages.value.push({ img, name });
         });
     });
   });
+  return new Promise((res) => {
+    res(extractedImages);
+  });
 };
 
-export { extractedImages, extractAndDisplayImages, extractAndDisplayImages_sync, compareLabels };
+export { extractAndDisplayImages, extractAndDisplayImages_sync, compareLabels };

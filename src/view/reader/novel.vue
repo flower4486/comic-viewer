@@ -152,7 +152,7 @@ async function updateChapterContent() {
   let contentres = await getChapterContent(chapter_id);
   let chapter_text = contentres[0].content;
   content_dics = chapter_text.split('\n');
-  content_dics = chunkArray(content_dics, 20);
+  content_dics = chunkArray(content_dics, 15);
 
   // console.log('content_dics', content_dics);
 }
@@ -212,7 +212,7 @@ window.addEventListener('beforeunload', function (event) {
   left: 0%;
   width: 100%;
   height: 100%;
-  background-color: #c4b395;
+  background-color: #ffffff;
   padding: 20px;
   line-height: 24px;
   letter-spacing: 2px;
@@ -308,6 +308,7 @@ window.addEventListener('beforeunload', function (event) {
     text-align: left; /* 文本内容左对齐 */
     color: #222;
     text-indent: 2em;
+    font-size: 20px;
   }
   .btn {
     display: flex;

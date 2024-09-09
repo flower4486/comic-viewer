@@ -17,17 +17,16 @@
 
 <script setup>
 import { getFileContent } from '@/requests/dav';
-import { extractedImages, extractAndDisplayImages_sync, compareLabels } from '@/requests/extract';
-import { useRouter, useRoute } from 'vue-router';
-import { onMounted, ref } from 'vue';
+import { extractAndDisplayImages_sync, compareLabels } from '@/requests/extract';
+import { useRouter } from 'vue-router';
+import { onMounted, ref, watch } from 'vue';
 import { usePathStore } from '@/store/pathStore';
 const pathStore = usePathStore();
 const router = useRouter();
-const route = useRoute();
 
 let show_imgs = $ref([]);
 let zipFile = $ref(null);
-
+let orderFlag = ref(0);
 let divread = ref();
 // //获取压缩包并解压
 // let davpromise = getFileContent(route.params.path);
@@ -43,8 +42,9 @@ function updateList(index) {
   let davpromise = getFileContent(file_path);
   davpromise.then((res) => {
     zipFile = res;
-    extractAndDisplayImages_sync(zipFile);
-    show_imgs = extractedImages.value;
+    extractAndDisplayImages_sync(zipFile).then((imgs) => {
+      show_imgs = imgs.value;
+    });
   });
 
   divread.value.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -52,7 +52,6 @@ function updateList(index) {
 
 function orderImg() {
   console.log('show_imgs', show_imgs);
-
   show_imgs.sort(compareLabels);
 }
 function router_back() {
@@ -66,6 +65,17 @@ function last_chapter() {
   pathStore.index--;
   updateList(pathStore.index);
 }
+watch(
+  () => show_imgs,
+  (value, oldValue) => {
+    console.log('排序', orderFlag.value);
+    orderImg();
+  },
+  {
+    deep: true,
+    immediate: true,
+  },
+);
 </script>
 
 <style scoped lang="scss">
