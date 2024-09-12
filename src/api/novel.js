@@ -76,8 +76,6 @@ export function getChapterContent(cid) {
 }
 
 export function deleNovelPost(nid) {
-  console.log('delenid', nid);
-
   return new Promise((res, rej) => {
     requests({
       url: '/novel/deleNovel',
@@ -91,6 +89,47 @@ export function deleNovelPost(nid) {
       })
       .catch((error) => {
         rej(error);
+      });
+  });
+}
+
+export function addRecordPost(rname, cnum, pnum) {
+  console.log('addRecord', `${rname}+${cnum}+${pnum}`);
+
+  return new Promise((res, rej) => {
+    requests({
+      url: '/novel/addRecord',
+      method: 'POST',
+      data: {
+        rname,
+        cnum,
+        pnum,
+      },
+    })
+      .then((result) => {
+        res(result.data);
+      })
+      .catch((err) => {
+        rej(err);
+      });
+  });
+}
+export function selctRecordPost(rname) {
+  console.log('rname', rname);
+
+  return new Promise((res, rej) => {
+    requests({
+      url: '/novel/selectRecord',
+      method: 'POST',
+      data: {
+        rname,
+      },
+    })
+      .then((result) => {
+        res(result.data);
+      })
+      .catch((err) => {
+        rej(err);
       });
   });
 }

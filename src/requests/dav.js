@@ -8,7 +8,6 @@ const client = createClient('http://192.168.31.70:5244/dav', {
 
 async function listDirectory(path) {
   const list = await client.getDirectoryContents(path);
-  console.log('list:', list);
   return list;
 }
 

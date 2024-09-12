@@ -58,7 +58,6 @@ function chapterSort(a, b) {
   } else {
     const a_arr = a.cname.match(/\d+/g);
     const b_arr = b.cname.match(/\d+/g);
-    console.log('a_arr', a_arr);
 
     for (let index = 0; index < a_arr.length; index++) {
       let numA = parseInt(a_arr[index]); // 提取字符串中的数字部分并转为整数

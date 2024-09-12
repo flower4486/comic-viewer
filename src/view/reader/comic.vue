@@ -1,5 +1,5 @@
 <template>
-  <button @click="orderImg">更正顺序</button>
+  <button @click="lasttime_read">上次阅读</button>
   <div ref="divread" class="comic-div">
     <el-scrollbar>
       <div v-for="item in show_imgs" :key="item.index" class="scrollbar-demo-item">
@@ -17,6 +17,7 @@
 
 <script setup>
 import { getFileContent } from '@/requests/dav';
+import { addRecordPost, selctRecordPost } from '@/api/novel';
 import { extractAndDisplayImages_sync, compareLabels } from '@/requests/extract';
 import { useRouter } from 'vue-router';
 import { onMounted, ref, watch } from 'vue';
@@ -26,19 +27,16 @@ const router = useRouter();
 
 let show_imgs = $ref([]);
 let zipFile = $ref(null);
-let orderFlag = ref(0);
 let divread = ref();
 // //获取压缩包并解压
 // let davpromise = getFileContent(route.params.path);
 onMounted(() => {
-  console.log(pathStore);
-
   updateList(pathStore.index);
 });
 
 function updateList(index) {
   let file_path = pathStore.path + '/' + pathStore.comicFiles[index].basename;
-  // console.log('file_path', file_path);
+
   let davpromise = getFileContent(file_path);
   davpromise.then((res) => {
     zipFile = res;
@@ -46,12 +44,10 @@ function updateList(index) {
       show_imgs = imgs.value;
     });
   });
-
   divread.value.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
 function orderImg() {
-  console.log('show_imgs', show_imgs);
   show_imgs.sort(compareLabels);
 }
 function router_back() {
@@ -59,16 +55,27 @@ function router_back() {
 }
 function next_chapter() {
   pathStore.index++;
+  //每次变换章节的时候都要记录一下章节数
+  addRecordPost(pathStore.path, pathStore.index, 0);
   updateList(pathStore.index);
 }
 function last_chapter() {
   pathStore.index--;
+  //每次变换章节的时候都要记录一下章节数
+  addRecordPost(pathStore.path, pathStore.index, 0);
   updateList(pathStore.index);
+}
+
+function lasttime_read() {
+  selctRecordPost(pathStore.path).then((res) => {
+    let last_index = res[0].chapterNum;
+    pathStore.index = last_index;
+    updateList(pathStore.index);
+  });
 }
 watch(
   () => show_imgs,
   (value, oldValue) => {
-    console.log('排序', orderFlag.value);
     orderImg();
   },
   {
