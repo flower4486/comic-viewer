@@ -40,7 +40,7 @@
 </template>
 
 <script setup>
-import { defineProps, watch, defineEmits, onMounted, reactive } from 'vue';
+import { watch, defineEmits, onMounted, reactive } from 'vue';
 import TreeMenu from './TreeMenu.vue';
 const emit = defineEmits(['update:font-size', 'update:currentTheme', 'input']);
 const props = defineProps({

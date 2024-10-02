@@ -1,12 +1,19 @@
 <script setup></script>
 
 <template>
-  <nav>
+  <el-button>
     <RouterLink :to="{ name: 'Folder', params: { path: '/' } }">文件夹</RouterLink>
-  </nav>
+  </el-button>
+  <el-button>
+    <RouterLink :to="{ name: 'Like' }">收藏</RouterLink>
+  </el-button>
   <main>
     <RouterView />
   </main>
 </template>
 
-<style scoped></style>
+<style scoped>
+.nav {
+  position: relative;
+}
+</style>

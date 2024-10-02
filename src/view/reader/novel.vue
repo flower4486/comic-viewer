@@ -13,7 +13,7 @@
       <h1 class="read-h1">{{ chapter_name }}</h1>
       <div v-for="(page, index) in content_dics" :key="page">
         <div v-for="para in page" :key="para">
-          <p v-show="index == page_index" class="read-text" v-html="para"></p>
+          <p v-if="index == page_index" class="read-text" v-html="para"></p>
         </div>
       </div>
     </div>
@@ -21,8 +21,8 @@
     <catlog @readshows="readshows" v-show="pageConfig.catlogShow" @closeLayer="showCatlog()" />
 
     <div class="readbottom">
-      <el-button type="primary" @click="last_chapter">上一章</el-button>
-      <el-button type="primary" @click="next_chapter">下一章</el-button>
+      <!-- <el-button type="primary" @click="last_chapter">上一章</el-button>
+      <el-button type="primary" @click="next_chapter">下一章</el-button> -->
       <el-button type="primary" @click="last_page">上一页</el-button>
       <el-button type="primary" @click="next_page">下一页</el-button>
     </div>
@@ -77,7 +77,7 @@ function last_page() {
     addRecordPost(novelStore.novel_name, novelStore.chapter_index, novelStore.page_index);
     dvtop.value.scrollIntoView({ behavior: 'smooth', block: 'start' });
   } else {
-    window.alert('已经是第一页');
+    last_chapter();
   }
 }
 function next_page() {
@@ -88,7 +88,7 @@ function next_page() {
     addRecordPost(novelStore.novel_name, novelStore.chapter_index, novelStore.page_index);
     dvtop.value.scrollIntoView({ behavior: 'smooth', block: 'start' });
   } else {
-    window.alert('已经是最后一页');
+    next_chapter();
   }
 }
 

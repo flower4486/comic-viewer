@@ -1,11 +1,12 @@
 <script setup>
-import { listDirectory, getFileText, getFileContent } from '@/requests/dav';
+import { listDirectory, getFileText, getFileContent } from '@/api/dav';
 import { onMounted } from 'vue';
 import { usePathStore } from '@/store/pathStore';
 import { useNovelStore } from '@/store/novelStore';
 import { getFileType } from '@/utils/utils';
 import { getNovelId, uploadNovel, getChapterList, deleNovelPost } from '@/api/novel';
 import { ArrowDown } from '@element-plus/icons-vue';
+import { addLikesPost } from '@/api/novel';
 const store = usePathStore();
 const novelStore = useNovelStore();
 
@@ -19,10 +20,8 @@ let directoryItems = $ref([
 
 async function updateList() {
   let folder_path = store.path.split('/第')[0];
-  // console.log('folder_path', folder_path);
   let listDir = await listDirectory(folder_path);
   directoryItems = listDir.sort(compareLabels);
-  // console.log('directoryItems', directoryItems);
 }
 
 onMounted(() => {
@@ -114,9 +113,12 @@ async function deleNovel(basename) {
     // console.log('delete res', res);
   }
 }
+//添加收藏
+async function addLike(basename, filename) {
+  await addLikesPost(basename, filename);
+}
 </script>
 <template>
-  <button @click="updateList">更新文件夹</button>
   <button @click="pop_path">返回上一级</button>
   <div class="grid-container">
     <div v-for="(item, index) in directoryItems" :key="item" class="grid-item">
@@ -137,6 +139,7 @@ async function deleNovel(basename) {
           <el-dropdown-menu>
             <el-dropdown-item @click="readNovel(item.basename, index)">阅读</el-dropdown-item>
             <el-dropdown-item @click="deleNovel(item.basename)">删除</el-dropdown-item>
+            <el-dropdown-item @click="addLike(item.basename, item.filename)">收藏</el-dropdown-item>
           </el-dropdown-menu>
         </template>
       </el-dropdown>

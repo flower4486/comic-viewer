@@ -133,3 +133,58 @@ export function selctRecordPost(rname) {
       });
   });
 }
+//查询收藏
+export function selctLikesPost() {
+  return new Promise((res, rej) => {
+    requests({
+      url: '/like/all',
+      method: 'POST',
+      data: {},
+    })
+      .then((result) => {
+        res(result.data);
+      })
+      .catch((err) => {
+        rej(err);
+      });
+  });
+}
+//添加收藏
+export function addLikesPost(lname, path) {
+  return new Promise((res, rej) => {
+    requests({
+      url: '/like/add',
+      method: 'POST',
+      data: {
+        lname,
+        path,
+      },
+    })
+      .then((result) => {
+        res(result.data);
+      })
+      .catch((err) => {
+        rej(err);
+      });
+  });
+}
+// 删除收藏
+export function deleLikePost(lname) {
+  console.log('lname', lname);
+
+  return new Promise((res, rej) => {
+    requests({
+      url: '/like/dele',
+      method: 'POST',
+      data: {
+        lname,
+      },
+    })
+      .then((result) => {
+        res(result.data);
+      })
+      .catch((error) => {
+        rej(error);
+      });
+  });
+}

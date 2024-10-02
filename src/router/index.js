@@ -11,6 +11,14 @@ export const constantRoutes = [
     },
   },
   {
+    path: '/like',
+    name: 'Like',
+    component: () => import('@/view/folder/like.vue'),
+    meta: {
+      isParentView: true,
+    },
+  },
+  {
     path: '/comic',
     name: 'Comic',
     component: () => import('@/view/reader/comic.vue'),

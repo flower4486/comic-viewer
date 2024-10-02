@@ -11,7 +11,7 @@
       @searchResults="epub_configs.onSearchResults">
       <template #book-content>
         <button class="my-find my-content" @click="showContent">
-          <img src="@/static/left-alignment.svg" alt="" />
+          <img src="@/assets/left-alignment.svg" alt="" />
         </button>
         <div class="search-widget1" v-if="epub_configs.openContent">
           <TreeMenu :subContent="epub_configs.toc" @showPage="showPage" />
@@ -19,7 +19,7 @@
       </template>
       <template #book-search>
         <button class="my-find" @click="toggleSearchWidget">
-          <img src="@/static/search.svg" alt="" />
+          <img src="@/assets/search.svg" alt="" />
         </button>
         <div class="search-widget1" v-if="epub_configs.openSearch">
           <input type="text" :value="serchQuery" @change="props.findText($event.target.value)" />
@@ -49,7 +49,7 @@
 <script setup>
 import Epub from 'epubjs';
 import { usePathStore } from '@/store/pathStore';
-import { getFileContent } from '@/requests/dav';
+import { getFileContent } from '@/api/dav';
 import { onMounted, watch, ref } from 'vue';
 import TreeMenu from './components/TreeMenu.vue';
 import PreferencesDropdown from './components/PreferencesDropdown.vue';

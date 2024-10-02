@@ -3,9 +3,16 @@ let extractedImages = ref([]);
 
 // 自定义比较函数，用于按照类似格式的属性进行自然数排序
 function compareLabels(a, b) {
-  const numberA = a.name;
-  const numberB = b.name;
-  return numberA - numberB;
+  const numberAs = a.name.match(/\d+/g);
+  const numberBs = b.name.match(/\d+/g);
+  for (let index = 0; index < numberAs.length; index++) {
+    const numA = numberAs[index];
+    const numB = numberBs[index];
+    if (numA != numB) {
+      return numA - numB;
+    }
+  }
+  return 0;
 }
 
 const extractAndDisplayImages = (zipData) => {

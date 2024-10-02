@@ -16,9 +16,9 @@
 </template>
 
 <script setup>
-import { getFileContent } from '@/requests/dav';
+import { getFileContent } from '@/api/dav';
 import { addRecordPost, selctRecordPost } from '@/api/novel';
-import { extractAndDisplayImages_sync, compareLabels } from '@/requests/extract';
+import { extractAndDisplayImages_sync, compareLabels } from '@/api/extract';
 import { useRouter } from 'vue-router';
 import { onMounted, ref, watch } from 'vue';
 import { usePathStore } from '@/store/pathStore';
@@ -51,6 +51,8 @@ function orderImg() {
   show_imgs.sort(compareLabels);
 }
 function router_back() {
+  //每次变换章节的时候都要记录一下章节数
+  addRecordPost(pathStore.path, pathStore.index, 0);
   router.push({ name: 'Folder', params: { path: pathStore.path } });
 }
 function next_chapter() {
