@@ -53,6 +53,7 @@ function orderImg() {
 function router_back() {
   //每次变换章节的时候都要记录一下章节数
   addRecordPost(pathStore.path, pathStore.index, 0);
+  divread.value.scrollIntoView({ behavior: 'smooth', block: 'start' });
   router.push({ name: 'Folder', params: { path: pathStore.path } });
 }
 function next_chapter() {

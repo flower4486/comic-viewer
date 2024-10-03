@@ -9,7 +9,9 @@
 
     <el-button type="primary" @click="showCatlog">目录</el-button>
 
-    <div style="min-height: 500px; padding-top: 30px; padding-bottom: 40px">
+    <div style="position: relative; min-height: 500px; padding-top: 30px; padding-bottom: 40px">
+      <div id="page_cover_left" @click="last_page"></div>
+      <div id="page_cover_right" @click="next_page"></div>
       <h1 class="read-h1">{{ chapter_name }}</h1>
       <div v-for="(page, index) in content_dics" :key="page">
         <div v-for="para in page" :key="para">
@@ -20,12 +22,14 @@
 
     <catlog @readshows="readshows" v-show="pageConfig.catlogShow" @closeLayer="showCatlog()" />
 
+    <!--
     <div class="readbottom">
-      <!-- <el-button type="primary" @click="last_chapter">上一章</el-button>
-      <el-button type="primary" @click="next_chapter">下一章</el-button> -->
+      <el-button type="primary" @click="last_chapter">上一章</el-button>
+      <el-button type="primary" @click="next_chapter">下一章</el-button>
       <el-button type="primary" @click="last_page">上一页</el-button>
       <el-button type="primary" @click="next_page">下一页</el-button>
     </div>
+    -->
   </div>
 </template>
 
@@ -293,5 +297,29 @@ onMounted(() => {
   .active {
     color: #00c98c;
   }
+}
+
+#page_cover_left {
+  z-index: 140;
+  margin: 0;
+  padding: 0%;
+  position: absolute;
+  // bottom: 0%;
+  width: 50%;
+  height: 100%;
+  opacity: 100%;
+  // background: #207218;
+}
+#page_cover_right {
+  z-index: 140;
+  margin: 0;
+  padding: 0;
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  width: 50%;
+  height: 100%;
+  opacity: 100;
+  // background: #8e1414;
 }
 </style>
