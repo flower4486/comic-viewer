@@ -130,7 +130,7 @@ onMounted(async () => {
     .then(() => {
       epub_configs.locations = JSON.parse(epub_configs.book.locations.save());
       epub_configs.ready = true;
-      console.log('epub_configs', epub_configs);
+      // console.log('epub_configs', epub_configs);
     });
   // console.log('book', book.navigation);
   // rendition = book.renderTo('reader', {

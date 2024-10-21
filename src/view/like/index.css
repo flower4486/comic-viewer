@@ -1,0 +1,26 @@
+
+.grid-container {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between; /* 控制水平方向上的间距 */
+}
+
+.grid-item {
+  flex: calc(25% - 20px); /* 设置每个项目的宽度，减去 margin 的部分 */
+  margin: 10px;
+  text-align: center;
+  border-radius: 4px;
+  background: var(--el-color-primary-light-9);
+  /* color: var(--el-color-primary); */
+  color: black;
+
+  display: flex; /* 将 .grid-item 设置为 flex 布局 */
+  justify-content: center; /* 水平居中 */
+  align-items: center; /* 垂直居中 */
+}
+.example-showcase .el-dropdown-link {
+  cursor: pointer;
+  color: var(--el-color-primary);
+  display: flex;
+  align-items: center;
+}

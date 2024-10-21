@@ -22,3 +22,8 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+*.png
+icon.*
+package-lock.json
+src-tauri/Cargo.lock
+package-lock.json

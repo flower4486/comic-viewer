@@ -1,0 +1,61 @@
+.comic-div {
+  position: relative;
+  margin: 0%;
+  padding: 0;
+  width: 100%;
+  .scrollbar-container-row {
+    display: flex;
+    flex-direction: row-reverse;
+    overflow-x: auto;
+    margin: 0px;
+    padding: 0px;
+    height: 100%;
+    .img {
+      margin: 0px;
+      padding: 0px;
+      height: 100%;
+      display: block;
+    }
+  }
+  .scrollbar-container-col {
+    position: relative;
+    align-content: center;
+    align-items: center;
+    width: 100%;
+    margin: 0px;
+    padding: 0px;
+    line-height: 0%;
+    .img {
+      max-width: 100%;
+      max-height: 100%;
+      object-fit: contain; /* 保持图片比例，完整显示 */
+      display: block;
+    }
+  }
+}
+
+.readbottom {
+  width: 100%;
+  position: relative;
+  bottom: 0;
+  left: 0;
+  z-index: 110;
+  opacity: 0.5;
+  background-color: #ffffff;
+  .mui-icon {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  .readbottom-color {
+    display: flex;
+    justify-content: space-around;
+    list-style: none;
+    margin-bottom: 20px;
+    li {
+      width: 300px;
+      height: 300px;
+      border-radius: 50%;
+    }
+  }
+}

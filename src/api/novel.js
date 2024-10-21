@@ -10,7 +10,7 @@ export function getNovelId(novel_name) {
       },
     })
       .then((result) => {
-        console.log('net return', result.data);
+        // console.log('net return', result.data);
         res(result.data);
       })
       .catch((error) => {
@@ -57,7 +57,7 @@ export function getChapterList(nid) {
 }
 
 export function getChapterContent(cid) {
-  console.log('cid', cid);
+  // console.log('cid', cid);
   return new Promise((res, rej) => {
     requests({
       url: '/novel/chapterContent',
@@ -94,7 +94,7 @@ export function deleNovelPost(nid) {
 }
 
 export function addRecordPost(rname, cnum, pnum) {
-  console.log('addRecord', `${rname}+${cnum}+${pnum}`);
+  // console.log('addRecord', `${rname}+${cnum}+${pnum}`);
 
   return new Promise((res, rej) => {
     requests({
@@ -115,7 +115,7 @@ export function addRecordPost(rname, cnum, pnum) {
   });
 }
 export function selctRecordPost(rname) {
-  console.log('rname', rname);
+  // console.log('rname', rname);
 
   return new Promise((res, rej) => {
     requests({
@@ -170,7 +170,7 @@ export function addLikesPost(lname, path) {
 }
 // 删除收藏
 export function deleLikePost(lname) {
-  console.log('lname', lname);
+  // console.log('lname', lname);
 
   return new Promise((res, rej) => {
     requests({

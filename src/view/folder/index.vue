@@ -1,3 +1,5 @@
+<template src="./index.html"></template>
+<style scoped src="./index.css"></style>
 <script setup>
 import { listDirectory, getFileText, getFileContent } from '@/api/dav';
 import { onMounted } from 'vue';
@@ -69,7 +71,7 @@ function readEpub(index, filename) {
 }
 
 async function readNovel(basename, index) {
-  console.log('basename', basename);
+  // console.log('basename', basename);
   let nid = -1;
   nid = await getNovelId(basename);
   if (nid == -1) {
@@ -87,7 +89,7 @@ async function readNovel(basename, index) {
         window.alert(res);
       });
     } catch (error) {
-      console.error(error);
+      // console.error(error);
     }
   } else {
     //数据库有小说，先设置好pinia参数，然后直接进入阅读界面
@@ -118,58 +120,3 @@ async function addLike(basename, filename) {
   await addLikesPost(basename, filename);
 }
 </script>
-<template>
-  <button @click="pop_path">返回上一级</button>
-  <div class="grid-container">
-    <div v-for="(item, index) in directoryItems" :key="item" class="grid-item">
-      <p>{{ item.basename }}&nbsp;</p>
-      <!-- <p>类型：{{ item.type }}&nbsp;</p> -->
-      <button v-if="item.type == 'directory'" @click="push_path(item.basename)">></button>
-      <button v-else-if="item.type == 'file' && getFileType(item.filename) == 'zip'" @click="readComic(index, item.basename)">阅读漫画</button>
-      <button v-else-if="item.type == 'file' && getFileType(item.filename) == 'epub'" @click="readEpub(index, item.basename)">阅读漫画</button>
-
-      <!-- <button  >阅读小说</button> -->
-      <el-dropdown v-else-if="item.type == 'file' && getFileType(item.filename) == 'txt'">
-        <span class="el-dropdown-link">
-          <el-icon class="el-icon--right">
-            <arrow-down />
-          </el-icon>
-        </span>
-        <template #dropdown>
-          <el-dropdown-menu>
-            <el-dropdown-item @click="readNovel(item.basename, index)">阅读</el-dropdown-item>
-            <el-dropdown-item @click="deleNovel(item.basename)">删除</el-dropdown-item>
-            <el-dropdown-item @click="addLike(item.basename, item.filename)">收藏</el-dropdown-item>
-          </el-dropdown-menu>
-        </template>
-      </el-dropdown>
-    </div>
-  </div>
-</template>
-<style scoped>
-.grid-container {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: space-between; /* 控制水平方向上的间距 */
-}
-
-.grid-item {
-  flex: calc(25% - 20px); /* 设置每个项目的宽度，减去 margin 的部分 */
-  margin: 10px;
-  text-align: center;
-  border-radius: 4px;
-  background: var(--el-color-primary-light-9);
-  /* color: var(--el-color-primary); */
-  color: black;
-
-  display: flex; /* 将 .grid-item 设置为 flex 布局 */
-  justify-content: center; /* 水平居中 */
-  align-items: center; /* 垂直居中 */
-}
-.example-showcase .el-dropdown-link {
-  cursor: pointer;
-  color: var(--el-color-primary);
-  display: flex;
-  align-items: center;
-}
-</style>

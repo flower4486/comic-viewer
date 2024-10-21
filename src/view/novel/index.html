@@ -1,0 +1,32 @@
+<!-- 目录 -->
+
+<div class="read">
+  <el-button type="primary" @click="router_back">返回</el-button>
+  <el-button type="primary" @click="last_chapter">上一章</el-button>
+  <el-text class="mx-1" type="primary">{{ parseInt(page_index) + 1 }}/{{ content_dics.length }}</el-text>
+  <el-button type="primary" @click="next_chapter">下一章</el-button>
+
+  <el-button type="primary" @click="showCatlog">目录</el-button>
+
+  <div style="position: relative; min-height: 500px; padding-top: 30px; padding-bottom: 40px" ref="dvtop">
+    <div id="page_cover_left" @click="last_page"></div>
+    <div id="page_cover_right" @click="next_page"></div>
+    <h1 class="read-h1">{{ chapter_name }}</h1>
+    <div v-for="(page, index) in content_dics" :key="page">
+      <div v-for="para in page" :key="para">
+        <p v-if="index == page_index" class="read-text" v-html="para"></p>
+      </div>
+    </div>
+  </div>
+
+  <catlog @readshows="readshows" v-show="pageConfig.catlogShow" @closeLayer="showCatlog()" />
+
+  <!--
+    <div class="readbottom">
+      <el-button type="primary" @click="last_chapter">上一章</el-button>
+      <el-button type="primary" @click="next_chapter">下一章</el-button>
+      <el-button type="primary" @click="last_page">上一页</el-button>
+      <el-button type="primary" @click="next_page">下一页</el-button>
+    </div>
+    -->
+</div>

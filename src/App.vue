@@ -7,13 +7,13 @@
   <el-button>
     <RouterLink :to="{ name: 'Like' }">收藏</RouterLink>
   </el-button>
-  <main>
+  <div class="main">
     <RouterView />
-  </main>
+  </div>
 </template>
 
 <style scoped>
 .nav {
-  position: relative;
+  position: absolute;
 }
 </style>

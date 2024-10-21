@@ -1,0 +1,13 @@
+<button @click="lasttime_read">上次阅读</button>
+<div ref="divread" class="comic-div">
+  <div :class="containerStyle">
+    <img v-for="item in show_imgs" :src="item.img" :key="item.index" />
+  </div>
+
+  <div class="readbottom">
+    <el-button type="primary" @click="router_back">返回</el-button>
+    <el-button type="primary" @click="last_chapter">上一章</el-button>
+    <el-button type="primary" @click="next_chapter">下一章</el-button>
+    <el-button type="primary" @click="change_read_mode">阅读模式</el-button>
+  </div>
+</div>

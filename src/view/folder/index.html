@@ -1,0 +1,26 @@
+<button @click="pop_path">返回上一级</button>
+<div class="grid-container">
+  <div v-for="(item, index) in directoryItems" :key="item" class="grid-item">
+    <p>{{ item.basename }}&nbsp;</p>
+    <!-- <p>类型：{{ item.type }}&nbsp;</p> -->
+    <button v-if="item.type == 'directory'" @click="push_path(item.basename)">></button>
+    <button v-else-if="item.type == 'file' && getFileType(item.filename) == 'zip'" @click="readComic(index, item.basename)">阅读漫画</button>
+    <button v-else-if="item.type == 'file' && getFileType(item.filename) == 'epub'" @click="readEpub(index, item.basename)">阅读漫画</button>
+
+    <!-- <button  >阅读小说</button> -->
+    <el-dropdown v-else-if="item.type == 'file' && getFileType(item.filename) == 'txt'">
+      <span class="el-dropdown-link">
+        <el-icon class="el-icon--right">
+          <arrow-down />
+        </el-icon>
+      </span>
+      <template #dropdown>
+        <el-dropdown-menu>
+          <el-dropdown-item @click="readNovel(item.basename, index)">阅读</el-dropdown-item>
+          <el-dropdown-item @click="deleNovel(item.basename)">删除</el-dropdown-item>
+          <el-dropdown-item @click="addLike(item.basename, item.filename)">收藏</el-dropdown-item>
+        </el-dropdown-menu>
+      </template>
+    </el-dropdown>
+  </div>
+</div>
