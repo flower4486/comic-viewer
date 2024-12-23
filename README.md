@@ -1,5 +1,18 @@
 # Vue 3 + Vite
+## 功能需求
 
-This template should help get you started developing with Vue 3 in Vite. The template uses Vue 3 `<script setup>` SFCs, check out the [script setup docs](https://v3.vuejs.org/api/sfc-script-setup.html#sfc-script-setup) to learn more.
+1. 能通过 webdav 协议访问我局域网搭建的 alist 网盘。
+2. 能将网盘中的压缩包，解析到前端，按照垂直分布显示图片。
+3. 能挂载 webdav 的文件夹，将其中的压缩包列表显示出来，供人选择。
+4. 能通过合理的页面路由，实现挂载文件夹列表，漫画页面，返回按键。
 
-Learn more about IDE Support for Vue in the [Vue Docs Scaling up Guide](https://vuejs.org/guide/scaling-up/tooling.html#ide-support).
+## 整体模块分析
+
+- 主要分为两个部分：
+- 前端：负责设计页面交互逻辑，美化界面，显示图片
+- 后端：负责交互 webdav 网盘，请求压缩包，解压缩，返回图片文件。
+
+## 技术实现细节
+
+- 前端部分：准备使用 Vue 构建用户界面和组件、VueRouter 管理路由、Pinia 用于状态管理、UI 库使用 ElementUI、图片加载库使用 Vue-lazyload,使用Vite作为构建工具，引入Tauri使得可以将前端界面打包成PC端和移动端应用。
+- 后端部分：使用 nodejs 搭建轻量简易服务器，Express 库用于构建 Web 流行框架、mysql 连接数据库、axios 用于网络请求、Sockect IO 进行实时通信、lodash 提供实用函数工具。

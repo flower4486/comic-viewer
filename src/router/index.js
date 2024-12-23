@@ -8,6 +8,7 @@ export const constantRoutes = [
     component: () => import('@/view/folder/index.vue'),
     meta: {
       isParentView: true,
+      keepAlive: true,
     },
   },
   {
@@ -16,12 +17,16 @@ export const constantRoutes = [
     component: () => import('@/view/like/index.vue'),
     meta: {
       isParentView: true,
+      keepAlive: true,
     },
   },
   {
     path: '/comic',
     name: 'Comic',
     component: () => import('@/view/comic/index.vue'),
+    meta: {
+      keepAlive: true,
+    },
   },
   {
     path: '/epub',
@@ -32,6 +37,9 @@ export const constantRoutes = [
     path: '/novel/:nid',
     name: 'Novel',
     component: () => import('@/view/novel/index.vue'),
+    meta: {
+      keepAlive: true,
+    },
   },
   // {
   //   // path: '/404',

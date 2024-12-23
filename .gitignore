@@ -27,3 +27,4 @@ icon.*
 package-lock.json
 src-tauri/Cargo.lock
 package-lock.json
+.VSCodeCounter/

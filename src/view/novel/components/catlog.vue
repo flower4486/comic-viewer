@@ -42,7 +42,6 @@ let chapter_list = $ref([]);
 const emit = defineEmits(['readshows', 'closeLayer']);
 function getIndex(index) {
   emit('readshows', index); //将点击的章节传给父组件 read.vue
-  console.log(index);
 }
 function getback() {
   emit('closeLayer');

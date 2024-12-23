@@ -241,7 +241,6 @@ function getContent(value) {
   epub_configs.toc = value;
 }
 watch(currentTheme, (val) => {
-  console.log('', val);
   setTheme(val);
 });
 function setTheme(theme) {
